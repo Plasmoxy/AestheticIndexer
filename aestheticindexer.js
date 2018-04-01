@@ -145,11 +145,6 @@ folders.forEach(function(folder, folderIndex) {
 
   console.log('PROCESSING: ' + folder);
 
-  if (!fs.existsSync(folder + path.sep + 'desc.txt')) {
-    console.log(' -> no desc.txt found : ' + folder);
-    return;
-  }
-
   let html = base(path.resolve(folder).split(path.sep).pop());
 
   // directories
@@ -160,7 +155,8 @@ folders.forEach(function(folder, folderIndex) {
         true,
         file,
         btnTypes[0],
-        fs.readFileSync(path.resolve(folder + path.sep + 'desc.txt'))
+        fs.existsSync(folder + path.sep + 'desc.txt') ?
+        fs.readFileSync(path.resolve(folder + path.sep + 'desc.txt')) : ''
       );
   });
 
