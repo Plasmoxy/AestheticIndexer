@@ -7,7 +7,7 @@ const path = require('path');
 
 // your folders here
 const folders = [
-  'test'
+  '.'
 ];
 
 const btnTypes = [
@@ -16,9 +16,13 @@ const btnTypes = [
   'btn-outline-success',
   'btn-outline-danger',
   'btn-outline-info'
-]
+];
 
-function base(fname) {return `
+function safeReadFile(file) {
+  return (fs.existsSync(file) ? fs.readFileSync(file) : '')
+}
+
+function base(fname, localdescription) {return `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -95,7 +99,7 @@ function base(fname) {return `
 
   <div id="titleContainer" class="text-center bg-warning roundcorners mt-2 blacc p-2">
     <h1 class="title">`+fname+`</h1>
-    <h5>Plasmoxy's AestheticIndexer project folder view</h5>
+    <h4>`+localdescription+`</h4>
   </div>
 
 
@@ -108,8 +112,9 @@ function endBase() { return `
 <footer>
     <div class="row justify-content-center mt-5 mb-1">
       <div class="card bg-dark text-white px-5">
-        <div class="card-body p-1 px-5">
-          (C) <a href="https://github.com/Plasmoxy">Plasmoxy</a> 2018
+        <div class="card-body text-center p-1 px-5">
+          Bootstrap 4 project folder index generated using
+          <a href="https://github.com/Plasmoxy/AestheticIndexer">AestheticIndexer by Plasmoxy</a>
         </div>
       </div>
     </div>
@@ -145,7 +150,10 @@ folders.forEach(function(folder, folderIndex) {
 
   console.log('PROCESSING: ' + folder);
 
-  let html = base(path.resolve(folder).split(path.sep).pop());
+  let html = base(
+    path.resolve(folder).split(path.sep).pop(),
+    safeReadFile(folder + path.sep + 'desc.txt')
+  );
 
   // directories
   fs.readdirSync(folder).forEach(function(file, i) {
@@ -155,15 +163,14 @@ folders.forEach(function(folder, folderIndex) {
         true,
         file,
         btnTypes[0],
-        fs.existsSync(folder + path.sep + 'desc.txt') ?
-        fs.readFileSync(path.resolve(folder + path.sep + 'desc.txt')) : ''
+        safeReadFile(folder + path.sep + file + path.sep + 'desc.txt')
       );
   });
 
   // files
   fs.readdirSync(folder).forEach(function(file, i) {
     var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
-    if (file != "desc.txt" && file != "index.html" && !isDir)
+    if (!isDir && file != "desc.txt" && file != "index.html")
       html += card(
         false,
         file,
