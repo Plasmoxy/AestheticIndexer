@@ -1,17 +1,18 @@
 /* Aesthetic linker js utility which creates cool folder structure index */
-/* generates html using nodejs */
+/* generates Bootstrap 4 html index using nodejs */
 
 const fs = require('fs');
 const path = require('path');
 
+// your folders here
 const folders = [
-  'assets'
+  'test'
 ];
 
 const btnTypes = [
+  'btn-outline-warning',
   'btn-outline-primary',
   'btn-outline-success',
-  'btn-outline-warning',
   'btn-outline-danger',
   'btn-outline-info'
 ]
@@ -66,6 +67,16 @@ function base(fname) {return `
     background: #0f0f0f;
   }
 
+  .btn-outline-white {
+    border-color: white;
+    color: white;
+  }
+
+  .btn-outline-white:hover {
+    background: white;
+    color: black;
+  }
+
   a {
     color: #00ffe0;
   }
@@ -91,8 +102,7 @@ function base(fname) {return `
 `}
 
 function endBase() { return `
-</div> <!-- end projrow -->
-
+  </div> <!-- end projrow -->
 
 <footer>
     <div class="row justify-content-center mt-5 mb-1">
@@ -109,17 +119,23 @@ function endBase() { return `
 </html>
 `}
 
-function card(target, description) {return `
-<div class="col-lg-4 p-3">
-  <div class="card bg-dark">
-    <div class="card-header">
-      <a class="btn btn-outline-warning w-100" href="`+target+`">`+target+`</a>
+function card(isDirectory, target, btntype, description) {return `
+    <div class="col-lg-4 d-flex align-items-center p-3">
+      <div class="card bg-dark w-100">
+        <div class="card-header">
+          <a class="btn `+btntype+` w-100" href="`+target+`">`+target+`</a>
+        </div>
+        ` + (
+          isDirectory ?
+            `
+            <div class="card-body">
+              `+description+`
+            </div>
+            `
+          : ''
+        ) + `
+      </div>
     </div>
-    <div class="card-body">
-      `+description+`
-    </div>
-  </div>
-</div>
 
 `}
 
@@ -128,27 +144,35 @@ folders.forEach(function(folder, folderIndex) {
 
   console.log('PROCESSING: ' + folder);
 
+  if (!fs.existsSync(folder + path.sep + 'desc.txt')) {
+    console.log(' -> no desc.txt found : ' + folder);
+    return;
+  }
+
   let html = base(path.resolve(folder).split(path.sep).pop());
 
-
-  // first dirs
+  // directories
   fs.readdirSync(folder).forEach(function(file, i) {
     var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
-    if (file != "desc.txt" && file != "index.html" && isDir)
-      stuff += card(file, fs.readfileSync(path.resolve(file)))
+    if (isDir)
+      html += card(
+        true,
+        file,
+        btnTypes[0],
+        fs.readFileSync(path.resolve(folder + path.sep + 'desc.txt'))
+      );
   });
 
-/*
-  // then files
+  // files
   fs.readdirSync(folder).forEach(function(file, i) {
     var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
-    if (file != "linker.js" && file != "index.html" && !isDir)
-      stuff += '<a class="file" ' + 'href="' + file + '">' + file + '</a>';
-    stuff += '<br class="nodeBreak">';
-    if (i!=0 && i%3 == 0) stuff += '<br class="nodeBreakOrdered">';
-    stuff += '\n';
+    if (file != "desc.txt" && file != "index.html" && !isDir)
+      html += card(
+        false,
+        file,
+        'btn-outline-white'
+      );
   });
-  */
 
   html += endBase();
 
