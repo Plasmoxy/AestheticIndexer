@@ -1,4 +1,5 @@
 /* Aesthetic linker js utility which creates cool folder structure index */
+/* copy this anywhere where you want and run */
 /* generates Bootstrap 4 html index using nodejs */
 
 const fs = require('fs');
