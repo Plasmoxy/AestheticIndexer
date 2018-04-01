@@ -1,14 +1,16 @@
 /* Aesthetic linker js utility which creates cool folder structure index */
 /* copy this anywhere where you want and run */
 /* generates Bootstrap 4 html index using nodejs */
+/* by Plasmoxy */
 
 const fs = require('fs');
 const path = require('path');
 
 // your folders here
-const folders = [
-  
-];
+const folders = process.argv.slice();
+folders.splice(0, 2);
+
+console.log('AestheticLinker by Plasmoxy\nGOT ARGUMENTS : ' + folders + '\n');
 
 const dirButton = 'btn-warning text-dark';
 const fileButton = 'btn-outline-white';
