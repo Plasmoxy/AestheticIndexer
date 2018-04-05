@@ -10,7 +10,7 @@ const path = require('path');
 const folders = process.argv.slice();
 folders.splice(0, 2);
 
-console.log('AestheticLinker by Plasmoxy\nGOT ARGUMENTS : ' + folders + '\n');
+console.log('AestheticIndexer by Plasmoxy\nGOT ARGUMENTS : ' + folders + '\n');
 
 const dirButton = 'btn-warning text-dark';
 const fileButton = 'btn-outline-white';
