@@ -71,7 +71,7 @@ function base(fname, localdescription) {return `
   }
 
   .bg-night {
-    background: #0f0f0f;
+    background: #08080d;
   }
 
   .btn-outline-white {
