@@ -7,14 +7,18 @@ const fs = require('fs');
 const path = require('path');
 
 // your folders here
-const folders = process.argv.slice();
-folders.splice(0, 2);
+let folder = process.argv[2]; // third argument is first cmd argument so the folder
 
-console.log('AestheticLinker by Plasmoxy\nGOT ARGUMENTS : ' + folders + '\n');
+if (!folder) {
+  console.log('ERROR : You must specify a folder as an argument !');
+  process.exit(-1);
+}
 
-const dirButton = 'btn-warning text-dark';
+console.log('AestheticLinker by Plasmoxy\nCreating index files for : ' + folder + '\n');
+
+const dirButton = 'btn-warning blacc';
 const fileButton = 'btn-outline-white';
-const titleStyle = 'bg-cyan blacc';
+const titleStyle = 'bg-warning blacc';
 
 function safeReadFile(file) {
   return (fs.existsSync(file) ? fs.readFileSync(file) : '')
@@ -81,10 +85,11 @@ function base(fname, localdescription) {return `
   }
 
   a {
-    color: #00ffe0;
+    color: #ff0091;
   }
+
   a:hover {
-    color: #ffc107;
+    color: #ff06ee;
   }
 
   </style>
@@ -127,7 +132,7 @@ function card(isDirectory, target, btntype, description) {return `
     <div class="col-lg-4 d-flex align-items-center p-3">
       <div class="card bg-dark w-100">
         <div class="card-header">
-          <a class="btn `+btntype+` w-100" href="`+target+`">`+target+`</a>
+          <a class="btn `+btntype+` w-100 pt-2 pb-0" href="`+target+`"><h5>`+target+`</h5></a>
         </div>
         ` + (
           isDirectory ?
@@ -144,40 +149,37 @@ function card(isDirectory, target, btntype, description) {return `
 `}
 
 
-folders.forEach(function(folder, folderIndex) {
+console.log('PROCESSING: ' + folder);
 
-  console.log('PROCESSING: ' + folder);
+let html = base(
+  path.resolve(folder).split(path.sep).pop(),
+  safeReadFile(folder + path.sep + 'desc.txt')
+);
 
-  let html = base(
-    path.resolve(folder).split(path.sep).pop(),
-    safeReadFile(folder + path.sep + 'desc.txt')
-  );
-
-  // directories
-  fs.readdirSync(folder).forEach(function(file, i) {
-    var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
-    if (isDir)
-      html += card(
-        true,
-        file,
-        dirButton,
-        safeReadFile(folder + path.sep + file + path.sep + 'desc.txt')
-      );
-  });
-
-  // files
-  fs.readdirSync(folder).forEach(function(file, i) {
-    var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
-    if (!isDir && file != "desc.txt" && file != "index.html")
-      html += card(
-        false,
-        file,
-        fileButton
-      );
-  });
-
-  html += endBase();
-
-
-  fs.writeFileSync(path.resolve(folder) + '/index.html', html);
+// directories
+fs.readdirSync(folder).forEach(function(file, i) {
+  var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
+  if (isDir)
+    html += card(
+      true,
+      file,
+      dirButton,
+      safeReadFile(folder + path.sep + file + path.sep + 'desc.txt')
+    );
 });
+
+// files
+fs.readdirSync(folder).forEach(function(file, i) {
+  var isDir = fs.lstatSync(folder + path.sep + file).isDirectory();
+  if (!isDir && file != "desc.txt" && file != "index.html")
+    html += card(
+      false,
+      file,
+      fileButton
+    );
+});
+
+html += endBase();
+
+
+fs.writeFileSync(path.resolve(folder) + '/index.html', html);
